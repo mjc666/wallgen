@@ -1,0 +1,8 @@
+[Unit]
+Description=Generate and apply AI wallpaper
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/wallgen generate
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%U/bus

@@ -1,0 +1,20 @@
+[project]
+name = "wallgen"
+version = "0.1.0"
+description = "AI wallpaper generator for KDE Plasma using Google Gemini"
+requires-python = ">=3.10"
+dependencies = [
+    "google-genai",
+    "Pillow",
+    "pyyaml",
+]
+
+[project.scripts]
+wallgen = "wallgen.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["wallgen*"]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
