@@ -45,6 +45,11 @@ wallgen generate --theme "sunset over mountains"
 # Generate without applying to desktop
 wallgen generate --no-apply
 
+# Ultrawide mode: crop, stitch, or stretch (for super-ultrawide displays)
+wallgen generate --mode crop
+wallgen generate --mode stitch
+wallgen generate --mode stretch
+
 # Set an existing image as wallpaper
 wallgen set /path/to/image.png
 
@@ -64,9 +69,22 @@ Located at `~/.config/wallgen/config.yaml`. See [config.example.yaml](config.exa
 | `model` | *(auto)* | Model name (defaults to provider's recommended model) |
 | `output_dir` | `~/.local/share/wallgen` | Where wallpapers are saved |
 | `max_stored` | `20` | Number of recent wallpapers to keep |
+| `mode` | `crop` | Ultrawide mode: `crop`, `stitch`, or `stretch` |
 | `themes` | *(8 built-in)* | List of prompts to rotate through |
 
 Themes are cycled sequentially, with rotation state tracked in `~/.config/wallgen/state.json`.
+
+## Ultrawide support
+
+Displays wider than what the AI provider supports (e.g. 5120x1440 / 32:9) are automatically detected. Choose a strategy with `--mode` or set a default in config:
+
+| Mode | Description |
+|---|---|
+| `crop` | Generate at the widest API ratio, center-crop to fit your display |
+| `stitch` | Generate two 16:9 images and place them side-by-side |
+| `stretch` | Generate at the widest API ratio and stretch to fit |
+
+For standard displays these modes are ignored and the image is generated at the native aspect ratio.
 
 ## Automatic scheduling
 
