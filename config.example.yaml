@@ -1,17 +1,31 @@
 # wallgen configuration
 # Place this at ~/.config/wallgen/config.yaml
 
+# Image generation provider: "gemini" or "grok"
+provider: "gemini"
+
 # Google Gemini API key (or set GOOGLE_API_KEY env var)
 api_key: ""
 
-# Gemini model for image generation
-model: "gemini-2.0-flash-exp"
+# xAI Grok API key (or set XAI_API_KEY env var)
+xai_api_key: ""
+
+# Model for image generation (leave empty for provider default)
+# Gemini default: gemini-2.5-flash-image
+# Grok default: grok-imagine-image
+model: ""
 
 # Where to save generated wallpapers
 output_dir: "~/.local/share/wallgen"
 
 # Keep this many recent wallpapers (older ones are deleted)
 max_stored: 20
+
+# Ultrawide mode — used when your display is wider than the API supports
+# "crop":    generate at widest API ratio, center-crop to fit your display
+# "stitch":  generate two 16:9 images and place them side-by-side
+# "stretch": generate at widest API ratio and stretch to fit
+mode: "crop"
 
 # Themes to rotate through — one is picked per generation
 themes:

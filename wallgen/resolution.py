@@ -1,18 +1,17 @@
 import subprocess
 import re
 
-# Gemini-supported aspect ratios mapped to common resolutions
-ASPECT_RATIOS = {
-    (16, 9): "16:9",
-    (16, 10): "16:9",   # closest supported
-    (21, 9): "16:9",    # ultrawide → closest supported
-    (4, 3): "4:3",
-    (3, 2): "3:2",
-    (1, 1): "1:1",
-}
+# Supported aspect ratios per provider (landscape only, widest first)
+GEMINI_RATIOS = ["21:9", "16:9", "3:2", "4:3", "5:4", "1:1"]
+GROK_RATIOS = ["20:9", "2:1", "16:9", "3:2", "4:3", "1:1"]
 
 FALLBACK_WIDTH = 1920
 FALLBACK_HEIGHT = 1080
+
+
+def _ratio_value(label: str) -> float:
+    w, h = label.split(":")
+    return float(w) / float(h)
 
 
 def detect_resolution() -> tuple[int, int]:
@@ -23,9 +22,31 @@ def detect_resolution() -> tuple[int, int]:
     return FALLBACK_WIDTH, FALLBACK_HEIGHT
 
 
-def detect_aspect_ratio() -> str:
+def detect_aspect_ratio(provider: str) -> str:
     w, h = detect_resolution()
-    return _closest_aspect_ratio(w, h)
+    return get_best_api_ratio(provider, w, h)
+
+
+def get_best_api_ratio(provider: str, w: int, h: int) -> str:
+    """Return the closest supported API aspect ratio for the given resolution."""
+    ratios = GEMINI_RATIOS if provider == "gemini" else GROK_RATIOS
+    target = w / h
+
+    best = ratios[0]
+    best_dist = float("inf")
+    for label in ratios:
+        dist = abs(_ratio_value(label) - target)
+        if dist < best_dist:
+            best_dist = dist
+            best = label
+    return best
+
+
+def needs_ultrawide_processing(provider: str, w: int, h: int) -> bool:
+    """Return True if the display is wider than the widest ratio the API supports."""
+    ratios = GEMINI_RATIOS if provider == "gemini" else GROK_RATIOS
+    widest = _ratio_value(ratios[0])
+    return (w / h) > widest
 
 
 def _try_xrandr() -> tuple[int, int] | None:
@@ -58,23 +79,3 @@ def _try_kscreen_doctor() -> tuple[int, int] | None:
         if match:
             return int(match.group(1)), int(match.group(2))
     return None
-
-
-def _closest_aspect_ratio(w: int, h: int) -> str:
-    from math import gcd
-    g = gcd(w, h)
-    rw, rh = w // g, h // g
-
-    if (rw, rh) in ASPECT_RATIOS:
-        return ASPECT_RATIOS[(rw, rh)]
-
-    # Find closest by ratio distance
-    target = w / h
-    best = "16:9"
-    best_dist = float("inf")
-    for (aw, ah), label in ASPECT_RATIOS.items():
-        dist = abs(aw / ah - target)
-        if dist < best_dist:
-            best_dist = dist
-            best = label
-    return best

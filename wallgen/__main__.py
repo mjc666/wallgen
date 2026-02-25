@@ -8,6 +8,8 @@ from .wallpaper import set_wallpaper
 
 def cmd_generate(args):
     cfg = load_config()
+    if args.mode:
+        cfg["mode"] = args.mode
     theme = args.theme or next_theme(cfg)
     path = generate_wallpaper(cfg, theme)
     if not args.no_apply:
@@ -39,6 +41,11 @@ def main():
     gen.add_argument(
         "--no-apply", action="store_true",
         help="Generate only, don't set as wallpaper",
+    )
+    gen.add_argument(
+        "--mode", choices=["crop", "stitch", "stretch"],
+        help="Ultrawide mode: crop (center-crop to fit), "
+             "stitch (two images side-by-side), stretch (stretch to fit)",
     )
 
     setp = sub.add_parser("set", help="Set an existing image as wallpaper")

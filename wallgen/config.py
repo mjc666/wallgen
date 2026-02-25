@@ -8,14 +8,22 @@ CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / 
 CONFIG_PATH = CONFIG_DIR / "config.yaml"
 STATE_PATH = CONFIG_DIR / "state.json"
 
+DEFAULT_MODELS = {
+    "gemini": "gemini-2.5-flash-image",
+    "grok": "grok-imagine-image",
+}
+
 DEFAULT_CONFIG = {
+    "provider": "gemini",
     "api_key": "",
-    "model": "gemini-2.0-flash-exp",
+    "xai_api_key": "",
+    "model": "",
     "output_dir": str(
         Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
         / "wallgen"
     ),
     "max_stored": 20,
+    "mode": "crop",
     "themes": [
         "vast alien landscape with bioluminescent flora, cinematic lighting",
         "cyberpunk cityscape at night, neon reflections on wet streets",
@@ -41,13 +49,30 @@ def load_config() -> dict:
     cfg = {**DEFAULT_CONFIG, **user}
     cfg["output_dir"] = str(Path(cfg["output_dir"]).expanduser())
 
-    api_key = cfg["api_key"] or os.environ.get("GOOGLE_API_KEY", "")
-    if not api_key:
-        raise ValueError(
-            "No API key configured. Set 'api_key' in config.yaml "
-            "or export GOOGLE_API_KEY."
-        )
-    cfg["api_key"] = api_key
+    provider = cfg["provider"]
+    if provider not in DEFAULT_MODELS:
+        raise ValueError(f"Unknown provider '{provider}'. Use 'gemini' or 'grok'.")
+
+    if not cfg["model"]:
+        cfg["model"] = DEFAULT_MODELS[provider]
+
+    if provider == "gemini":
+        api_key = cfg["api_key"] or os.environ.get("GOOGLE_API_KEY", "")
+        if not api_key:
+            raise ValueError(
+                "No Gemini API key configured. Set 'api_key' in config.yaml "
+                "or export GOOGLE_API_KEY."
+            )
+        cfg["api_key"] = api_key
+    elif provider == "grok":
+        xai_key = cfg["xai_api_key"] or os.environ.get("XAI_API_KEY", "")
+        if not xai_key:
+            raise ValueError(
+                "No xAI API key configured. Set 'xai_api_key' in config.yaml "
+                "or export XAI_API_KEY."
+            )
+        cfg["xai_api_key"] = xai_key
+
     return cfg
 
 
@@ -59,7 +84,7 @@ def create_default_config():
     with open(CONFIG_PATH, "w") as f:
         yaml.dump(DEFAULT_CONFIG, f, default_flow_style=False, sort_keys=False)
     print(f"Created default config: {CONFIG_PATH}")
-    print("Edit it to add your GOOGLE_API_KEY.")
+    print("Edit it to add your API key.")
 
 
 def load_state() -> dict:

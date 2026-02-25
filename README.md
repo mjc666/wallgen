@@ -1,12 +1,12 @@
 # wallgen
 
-AI wallpaper generator for KDE Plasma using Google Gemini. Generates unique wallpapers from themed prompts, applies them to your desktop, and can run on a schedule via systemd.
+AI wallpaper generator for KDE Plasma using Google Gemini or xAI Grok. Generates unique wallpapers from themed prompts, applies them to your desktop, and can run on a schedule via systemd.
 
 ## Requirements
 
 - Python >= 3.10
 - KDE Plasma
-- Google Gemini API key
+- API key for [Google Gemini](https://aistudio.google.com/apikey) or [xAI Grok](https://console.x.ai/)
 
 ## Installation
 
@@ -22,7 +22,10 @@ pipx install .
    wallgen config
    ```
 
-2. Add your Gemini API key to `~/.config/wallgen/config.yaml`, or set the `GOOGLE_API_KEY` environment variable.
+2. Edit `~/.config/wallgen/config.yaml`:
+   - Set `provider` to `gemini` or `grok`
+   - Add your API key (`api_key` for Gemini, `xai_api_key` for Grok)
+   - Or use environment variables: `GOOGLE_API_KEY` / `XAI_API_KEY`
 
 3. Test it:
 
@@ -55,8 +58,10 @@ Located at `~/.config/wallgen/config.yaml`. See [config.example.yaml](config.exa
 
 | Setting | Default | Description |
 |---|---|---|
-| `api_key` | `""` | Gemini API key (or use `GOOGLE_API_KEY` env var) |
-| `model` | `gemini-2.0-flash-exp` | Gemini model for image generation |
+| `provider` | `gemini` | Image generation provider (`gemini` or `grok`) |
+| `api_key` | `""` | Gemini API key (or `GOOGLE_API_KEY` env var) |
+| `xai_api_key` | `""` | Grok API key (or `XAI_API_KEY` env var) |
+| `model` | *(auto)* | Model name (defaults to provider's recommended model) |
 | `output_dir` | `~/.local/share/wallgen` | Where wallpapers are saved |
 | `max_stored` | `20` | Number of recent wallpapers to keep |
 | `themes` | *(8 built-in)* | List of prompts to rotate through |
