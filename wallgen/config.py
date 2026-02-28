@@ -9,7 +9,7 @@ CONFIG_PATH = CONFIG_DIR / "config.yaml"
 STATE_PATH = CONFIG_DIR / "state.json"
 
 DEFAULT_MODELS = {
-    "gemini": "gemini-2.5-flash-image",
+    "gemini": "gemini-3.1-flash-image-preview",  # Also known as Nano Banana 2
     "grok": "grok-imagine-image",
 }
 

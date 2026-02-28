@@ -2,7 +2,7 @@ import subprocess
 import re
 
 # Supported aspect ratios per provider (landscape only, widest first)
-GEMINI_RATIOS = ["21:9", "16:9", "3:2", "4:3", "5:4", "1:1"]
+GEMINI_RATIOS = ["8:1", "4:1", "21:9", "16:9", "3:2", "4:3", "5:4", "1:1"]
 GROK_RATIOS = ["20:9", "2:1", "16:9", "3:2", "4:3", "1:1"]
 
 FALLBACK_WIDTH = 1920

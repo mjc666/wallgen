@@ -11,7 +11,7 @@ api_key: ""
 xai_api_key: ""
 
 # Model for image generation (leave empty for provider default)
-# Gemini default: gemini-2.5-flash-image
+# Gemini default: gemini-3.1-flash-image-preview (Nano Banana 2)
 # Grok default: grok-imagine-image
 model: ""
 

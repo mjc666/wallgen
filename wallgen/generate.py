@@ -33,7 +33,7 @@ def generate_wallpaper(cfg: dict, theme: str) -> Path:
     if ultrawide and mode == "stitch":
         _generate_stitched(cfg, provider, theme, target_w, target_h, output_path)
     else:
-        prompt = _build_prompt(theme)
+        prompt = _build_prompt(theme, api_ratio)
         _generate_single(cfg, provider, prompt, api_ratio, output_path)
         if ultrawide:
             _postprocess(output_path, mode, target_w, target_h)
@@ -43,9 +43,15 @@ def generate_wallpaper(cfg: dict, theme: str) -> Path:
     return output_path
 
 
-def _build_prompt(theme: str) -> str:
+def _build_prompt(theme: str, aspect_ratio: str = "16:9") -> str:
+    # Enhance prompt for ultra-wide panoramic shots
+    wide_suffix = ""
+    w, h = map(float, aspect_ratio.split(":"))
+    if w / h > 2.5:  # Wider than 21:9
+        wide_suffix = "panoramic, wide-angle cinematic view, "
+
     return (
-        f"Generate a high-resolution desktop wallpaper: {theme}. "
+        f"Generate a high-resolution desktop wallpaper: {wide_suffix}{theme}. "
         "The image should be vivid, detailed, and suitable as a desktop background "
         "with no text, watermarks, or UI elements."
     )
@@ -61,8 +67,8 @@ def _generate_single(cfg: dict, provider: str, prompt: str, aspect_ratio: str, o
 def _generate_stitched(cfg: dict, provider: str, theme: str, target_w: int, target_h: int, output_path: Path):
     """Generate two 16:9 images and stitch them side-by-side."""
     panel_w = target_w // 2
-    prompt_left = _build_prompt(theme + ", left half of a panoramic scene")
-    prompt_right = _build_prompt(theme + ", right half of a panoramic scene")
+    prompt_left = _build_prompt(theme + ", left half of a panoramic scene", "16:9")
+    prompt_right = _build_prompt(theme + ", right half of a panoramic scene", "16:9")
 
     left_path = output_path.with_suffix(".left.png")
     right_path = output_path.with_suffix(".right.png")
@@ -111,15 +117,24 @@ def _generate_gemini(cfg: dict, prompt: str, aspect_ratio: str, output_path: Pat
     from google import genai
     from google.genai import types
 
+    image_config = types.ImageConfig(aspect_ratio=aspect_ratio)
+    # Enable 4K resolution for Nano Banana 2 / Gemini 3.1 models
+    if "3.1" in cfg["model"] or "nano-banana" in cfg["model"]:
+        image_config.image_size = "4K"
+
     client = genai.Client(api_key=cfg["api_key"])
     response = client.models.generate_content(
         model=cfg["model"],
         contents=[prompt],
         config=types.GenerateContentConfig(
             response_modalities=["IMAGE"],
-            image_config=types.ImageConfig(aspect_ratio=aspect_ratio),
+            image_config=image_config,
         ),
     )
+
+    if response.usage_metadata:
+        usage = response.usage_metadata
+        print(f"Tokens: {usage.prompt_token_count} (prompt) + {usage.candidates_token_count} (candidates) = {usage.total_token_count} total")
 
     for part in response.parts:
         if part.inline_data is not None:

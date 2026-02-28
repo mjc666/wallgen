@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "AI wallpaper generator for KDE Plasma using Google Gemini or xAI Grok"
 requires-python = ">=3.10"
 dependencies = [
-    "google-genai",
+    "google-genai>=1.65.0",
     "xai-sdk",
     "Pillow",
     "pyyaml",

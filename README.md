@@ -1,6 +1,6 @@
 # wallgen
 
-AI wallpaper generator for KDE Plasma using Google Gemini or xAI Grok. Generates unique wallpapers from themed prompts, applies them to your desktop, and can run on a schedule via systemd.
+AI wallpaper generator for KDE Plasma using Google Gemini (including Nano Banana 2) or xAI Grok. Generates unique wallpapers from themed prompts, applies them to your desktop, and can run on a schedule via systemd.
 
 ## Requirements
 
