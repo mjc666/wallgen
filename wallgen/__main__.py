@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from .config import create_default_config, load_config, next_theme, CONFIG_PATH
+from .config import create_default_config, load_config, next_theme, CONFIG_PATH, add_theme
 from .generate import generate_wallpaper
 from .wallpaper import set_wallpaper
 
@@ -29,6 +29,10 @@ def cmd_config(args):
         create_default_config()
 
 
+def cmd_add_theme(args):
+    add_theme(args.theme)
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="wallgen",
@@ -53,6 +57,9 @@ def main():
 
     sub.add_parser("config", help="Show or create config file")
 
+    add = sub.add_parser("add-theme", help="Add a new theme prompt to config")
+    add.add_argument("theme", help="Theme prompt to add")
+
     args = parser.parse_args()
 
     if args.command is None:
@@ -60,7 +67,7 @@ def main():
         sys.exit(1)
 
     try:
-        {"generate": cmd_generate, "set": cmd_set, "config": cmd_config}[
+        {"generate": cmd_generate, "set": cmd_set, "config": cmd_config, "add-theme": cmd_add_theme}[
             args.command
         ](args)
     except (FileNotFoundError, ValueError, RuntimeError) as e:

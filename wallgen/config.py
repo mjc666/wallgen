@@ -1,5 +1,6 @@
 import json
 import os
+import random
 from pathlib import Path
 
 import yaml
@@ -100,11 +101,32 @@ def save_state(state: dict):
         json.dump(state, f)
 
 
+def add_theme(theme: str):
+    """Add a new theme to the config file."""
+    # We only want to save the user-defined parts to the file, 
+    # but load_config merges with defaults. To be safe and clean, 
+    # we'll read the raw file if it exists.
+    user_cfg = {}
+    if CONFIG_PATH.exists():
+        with open(CONFIG_PATH) as f:
+            user_cfg = yaml.safe_load(f) or {}
+    
+    if "themes" not in user_cfg:
+        user_cfg["themes"] = list(DEFAULT_CONFIG["themes"])
+    
+    if theme in user_cfg["themes"]:
+        print(f"Theme already exists: {theme}")
+        return
+
+    user_cfg["themes"].append(theme)
+    
+    with open(CONFIG_PATH, "w") as f:
+        yaml.dump(user_cfg, f, default_flow_style=False, sort_keys=False)
+    print(f"Added new theme: {theme}")
+
+
 def next_theme(cfg: dict) -> str:
     themes = cfg["themes"]
-    state = load_state()
-    idx = state.get("theme_index", 0) % len(themes)
-    theme = themes[idx]
-    state["theme_index"] = (idx + 1) % len(themes)
-    save_state(state)
-    return theme
+    if not themes:
+        return ""
+    return random.choice(themes)
