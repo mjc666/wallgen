@@ -138,3 +138,10 @@ def next_theme(cfg: dict) -> str:
     if not themes:
         return ""
     return random.choice(themes)
+
+
+def next_category(cfg: dict) -> str:
+    categories = cfg.get("categories", [])
+    if not categories:
+        return "wallpaper"
+    return random.choice(categories)

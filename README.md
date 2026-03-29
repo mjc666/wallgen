@@ -39,6 +39,12 @@ pipx install .
 # Generate a wallpaper (randomly selects from themes in config)
 wallgen generate
 
+# Generate a wallpaper from a one-off AI-generated theme category
+wallgen generate --category "space"
+
+# Generate a wallpaper from a random category defined in config
+wallgen generate --use-categories
+
 # Use a custom theme prompt
 wallgen generate --theme "sunset over mountains"
 
@@ -80,6 +86,7 @@ Located at `~/.config/wallgen/config.yaml`. See [config.example.yaml](config.exa
 | `max_stored` | `20` | Number of recent wallpapers to keep |
 | `mode` | `crop` | Ultrawide mode: `crop`, `stitch`, or `stretch` |
 | `themes` | *(8 built-in)* | List of prompts to rotate through |
+| `categories` | *(8 built-in)* | List of categories for `--use-categories` |
 
 Themes are randomly selected from the `themes` list in your config.
 

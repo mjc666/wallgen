@@ -5,6 +5,7 @@ from .config import (
     create_default_config,
     load_config,
     next_theme,
+    next_category,
     CONFIG_PATH,
     add_theme,
     add_themes,
@@ -17,7 +18,15 @@ def cmd_generate(args):
     cfg = load_config()
     if args.mode:
         cfg["mode"] = args.mode
-    theme = args.theme or next_theme(cfg)
+    
+    if args.category or args.use_categories:
+        category = args.category or next_category(cfg)
+        print(f"Generating random theme for category: {category}...")
+        themes = generate_theme(cfg, category, count=1)
+        theme = themes[0]
+    else:
+        theme = args.theme or next_theme(cfg)
+        
     path = generate_wallpaper(cfg, theme)
     if not args.no_apply:
         set_wallpaper(path)
@@ -57,6 +66,8 @@ def main():
 
     gen = sub.add_parser("generate", help="Generate and apply a new wallpaper")
     gen.add_argument("--theme", help="Override theme prompt")
+    gen.add_argument("--category", help="Generate a one-off theme from category (e.g. space)")
+    gen.add_argument("--use-categories", action="store_true", help="Use a random category from config")
     gen.add_argument(
         "--no-apply", action="store_true",
         help="Generate only, don't set as wallpaper",
