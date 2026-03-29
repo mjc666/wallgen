@@ -36,7 +36,7 @@ pipx install .
 ## Usage
 
 ```bash
-# Generate a wallpaper (rotates through themes automatically)
+# Generate a wallpaper (randomly selects from themes in config)
 wallgen generate
 
 # Use a custom theme prompt
@@ -44,6 +44,15 @@ wallgen generate --theme "sunset over mountains"
 
 # Generate without applying to desktop
 wallgen generate --no-apply
+
+# Generate new theme prompts using Gemini AI
+wallgen theme-gen "cyberpunk"
+
+# Generate multiple theme prompts at once
+wallgen theme-gen "space" --count 5
+
+# Add a specific theme prompt to the rotation
+wallgen add-theme "abstract geometric art, bold colors"
 
 # Ultrawide mode: crop, stitch, or stretch (for super-ultrawide displays)
 wallgen generate --mode crop
@@ -72,7 +81,7 @@ Located at `~/.config/wallgen/config.yaml`. See [config.example.yaml](config.exa
 | `mode` | `crop` | Ultrawide mode: `crop`, `stitch`, or `stretch` |
 | `themes` | *(8 built-in)* | List of prompts to rotate through |
 
-Themes are cycled sequentially, with rotation state tracked in `~/.config/wallgen/state.json`.
+Themes are randomly selected from the `themes` list in your config.
 
 ## Ultrawide support
 

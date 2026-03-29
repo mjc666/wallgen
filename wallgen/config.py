@@ -101,11 +101,11 @@ def save_state(state: dict):
         json.dump(state, f)
 
 
-def add_theme(theme: str):
-    """Add a new theme to the config file."""
-    # We only want to save the user-defined parts to the file, 
-    # but load_config merges with defaults. To be safe and clean, 
-    # we'll read the raw file if it exists.
+def add_themes(themes: list[str]):
+    """Add multiple themes to the config file at once."""
+    if not themes:
+        return
+
     user_cfg = {}
     if CONFIG_PATH.exists():
         with open(CONFIG_PATH) as f:
@@ -114,15 +114,23 @@ def add_theme(theme: str):
     if "themes" not in user_cfg:
         user_cfg["themes"] = list(DEFAULT_CONFIG["themes"])
     
-    if theme in user_cfg["themes"]:
-        print(f"Theme already exists: {theme}")
-        return
-
-    user_cfg["themes"].append(theme)
+    added_count = 0
+    for theme in themes:
+        if theme in user_cfg["themes"]:
+            print(f" - Already exists: {theme}")
+            continue
+        
+        user_cfg["themes"].append(theme)
+        print(f" + Added: {theme}")
+        added_count += 1
     
-    with open(CONFIG_PATH, "w") as f:
-        yaml.dump(user_cfg, f, default_flow_style=False, sort_keys=False)
-    print(f"Added new theme: {theme}")
+    if added_count > 0:
+        with open(CONFIG_PATH, "w") as f:
+            yaml.dump(user_cfg, f, default_flow_style=False, sort_keys=False)
+
+
+def add_theme(theme: str):
+    add_themes([theme])
 
 
 def next_theme(cfg: dict) -> str:

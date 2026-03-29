@@ -1,8 +1,15 @@
 import argparse
 import sys
 
-from .config import create_default_config, load_config, next_theme, CONFIG_PATH, add_theme
-from .generate import generate_wallpaper
+from .config import (
+    create_default_config,
+    load_config,
+    next_theme,
+    CONFIG_PATH,
+    add_theme,
+    add_themes,
+)
+from .generate import generate_wallpaper, generate_theme
 from .wallpaper import set_wallpaper
 
 
@@ -33,6 +40,14 @@ def cmd_add_theme(args):
     add_theme(args.theme)
 
 
+def cmd_theme_gen(args):
+    cfg = load_config()
+    count = args.count or 1
+    print(f"Generating {count} theme(s) for '{args.topic}'...")
+    themes = generate_theme(cfg, args.topic, count)
+    add_themes(themes)
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="wallgen",
@@ -60,6 +75,10 @@ def main():
     add = sub.add_parser("add-theme", help="Add a new theme prompt to config")
     add.add_argument("theme", help="Theme prompt to add")
 
+    tgen = sub.add_parser("theme-gen", help="Generate a new theme prompt using Gemini AI")
+    tgen.add_argument("topic", help="General topic for the theme (e.g. space, nature)")
+    tgen.add_argument("--count", "-c", type=int, default=1, help="Number of themes to generate")
+
     args = parser.parse_args()
 
     if args.command is None:
@@ -67,9 +86,14 @@ def main():
         sys.exit(1)
 
     try:
-        {"generate": cmd_generate, "set": cmd_set, "config": cmd_config, "add-theme": cmd_add_theme}[
-            args.command
-        ](args)
+        commands = {
+            "generate": cmd_generate,
+            "set": cmd_set,
+            "config": cmd_config,
+            "add-theme": cmd_add_theme,
+            "theme-gen": cmd_theme_gen,
+        }
+        commands[args.command](args)
     except (FileNotFoundError, ValueError, RuntimeError) as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)

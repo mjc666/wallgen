@@ -10,6 +10,39 @@ from .resolution import (
 )
 
 
+def generate_theme(cfg: dict, topic: str, count: int = 1) -> list[str]:
+    from google import genai
+
+    client = genai.Client(api_key=cfg["api_key"])
+    
+    # Use a standard text model for prompt generation
+    model_id = "gemini-3-flash-preview" 
+    
+    if count > 1:
+        prompt = (
+            f"Generate {count} unique, single-sentence descriptive prompts for high-quality desktop wallpapers "
+            f"based on the theme '{topic}'. Each description should be evocative, detailed, "
+            f"and focus on visual elements, lighting, and mood. "
+            f"Return them as a simple list with one description per line. "
+            f"Do not include any numbering, introductory text, or quotes."
+        )
+    else:
+        prompt = (
+            f"Generate a single-sentence descriptive prompt for a high-quality desktop wallpaper "
+            f"based on the theme '{topic}'. The description should be evocative, detailed, "
+            f"and focus on visual elements, lighting, and mood. "
+            f"Do not include any introductory text or quotes, just the description itself."
+        )
+
+    response = client.models.generate_content(
+        model=model_id,
+        contents=[prompt],
+    )
+    
+    lines = [line.strip().strip('"').strip("'").strip("- ") for line in response.text.split("\n") if line.strip()]
+    return lines[:count]
+
+
 def generate_wallpaper(cfg: dict, theme: str) -> Path:
     output_dir = Path(cfg["output_dir"])
     output_dir.mkdir(parents=True, exist_ok=True)

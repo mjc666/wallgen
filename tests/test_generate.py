@@ -1,6 +1,49 @@
 from unittest.mock import MagicMock, patch
 from pathlib import Path
-from wallgen.generate import _generate_gemini
+from wallgen.generate import _generate_gemini, generate_theme
+
+
+@patch("google.genai.Client")
+def test_generate_theme(mock_client_class):
+    mock_client = MagicMock()
+    mock_client_class.return_value = mock_client
+
+    mock_response = MagicMock()
+    mock_response.text = "A futuristic cyberpunk city with neon lights and wet pavement."
+    mock_client.models.generate_content.return_value = mock_response
+
+    cfg = {"api_key": "test_key"}
+    topic = "cyberpunk"
+
+    result = generate_theme(cfg, topic)
+
+    assert result == ["A futuristic cyberpunk city with neon lights and wet pavement."]
+    args, kwargs = mock_client.models.generate_content.call_args
+    assert kwargs["model"] == "gemini-3-flash-preview"
+
+    assert topic in kwargs["contents"][0]
+
+@patch("google.genai.Client")
+def test_generate_multiple_themes(mock_client_class):
+    mock_client = MagicMock()
+    mock_client_class.return_value = mock_client
+    
+    mock_response = MagicMock()
+    mock_response.text = "Theme 1\nTheme 2\nTheme 3"
+    mock_client.models.generate_content.return_value = mock_response
+    
+    cfg = {"api_key": "test_key"}
+    topic = "space"
+    
+    results = generate_theme(cfg, topic, count=3)
+    
+    assert len(results) == 3
+    assert results[0] == "Theme 1"
+    assert results[1] == "Theme 2"
+    assert results[2] == "Theme 3"
+    args, kwargs = mock_client.models.generate_content.call_args
+    assert "3" in kwargs["contents"][0]
+
 
 @patch("google.genai.Client")
 def test_generate_gemini_4k_support(mock_client_class):
