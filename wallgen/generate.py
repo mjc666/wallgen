@@ -12,6 +12,7 @@ from .resolution import (
 
 def generate_theme(cfg: dict, topic: str, count: int = 1) -> list[str]:
     from google import genai
+    from google.genai import types
 
     client = genai.Client(api_key=cfg["api_key"])
     
@@ -37,6 +38,7 @@ def generate_theme(cfg: dict, topic: str, count: int = 1) -> list[str]:
     response = client.models.generate_content(
         model=model_id,
         contents=[prompt],
+        config=types.GenerateContentConfig(temperature=0.9),
     )
     
     lines = [line.strip().strip('"').strip("'").strip("- ") for line in response.text.split("\n") if line.strip()]
