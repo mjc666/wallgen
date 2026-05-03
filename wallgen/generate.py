@@ -4,6 +4,12 @@ import string
 from pathlib import Path
 
 from PIL import Image
+
+from .resolution import (
+    detect_aspect_ratio,
+    detect_resolution,
+    needs_ultrawide_processing,
+)
 ...
 def generate_theme(cfg: dict, topic: str, count: int = 1) -> list[str]:
     from google import genai
