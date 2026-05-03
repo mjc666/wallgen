@@ -1,15 +1,10 @@
 from datetime import datetime
+import random
+import string
 from pathlib import Path
 
 from PIL import Image
-
-from .resolution import (
-    detect_aspect_ratio,
-    detect_resolution,
-    needs_ultrawide_processing,
-)
-
-
+...
 def generate_theme(cfg: dict, topic: str, count: int = 1) -> list[str]:
     from google import genai
     from google.genai import types
@@ -19,20 +14,24 @@ def generate_theme(cfg: dict, topic: str, count: int = 1) -> list[str]:
     # Use a standard text model for prompt generation
     model_id = "gemini-3-flash-preview" 
     
+    salt = "".join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    
     if count > 1:
         prompt = (
             f"Generate {count} unique, single-sentence descriptive prompts for high-quality desktop wallpapers "
             f"based on the theme '{topic}'. Each description should be evocative, detailed, "
             f"and focus on visual elements, lighting, and mood. "
             f"Return them as a simple list with one description per line. "
-            f"Do not include any numbering, introductory text, or quotes."
+            f"Do not include any numbering, introductory text, or quotes. "
+            f"Unique request ID: {salt}"
         )
     else:
         prompt = (
             f"Generate a single-sentence descriptive prompt for a high-quality desktop wallpaper "
             f"based on the theme '{topic}'. The description should be evocative, detailed, "
             f"and focus on visual elements, lighting, and mood. "
-            f"Do not include any introductory text or quotes, just the description itself."
+            f"Do not include any introductory text or quotes, just the description itself. "
+            f"Unique request ID: {salt}"
         )
 
     response = client.models.generate_content(
